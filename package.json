@@ -1,0 +1,16 @@
+{
+  "name": "frameworkproject",
+  "version": "1.0.0",
+  "description": "Framework basado en Laravel",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "Carlos Arturo Montoya Gavaldon",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}
