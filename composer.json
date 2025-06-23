@@ -18,7 +18,8 @@
             "App\\Controllers\\" : "app/Controllers",
             "App\\Models\\" : "app/Models",
             "MVC\\" : "./",
-            "App\\Utils\\" : "app/Utils"
+            "App\\Utils\\" : "app/Utils",
+            "App\\Middlewares\\" : "app/Middlewares"
         }
     }
 }

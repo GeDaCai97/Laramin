@@ -12,12 +12,25 @@ class Router {
 
     //Array de rutas por middleware
     public array $middlewares = [];
+    // Array de middlewares por grupo de rutas
+    public array $groupMiddlewares = [];
 
     //Funcion para agregar middleware a una ruta
     // Esta función permite agregar middlewares a una ruta específica
     public function middleware($url, $middlewareFn)
     {
         $this->middlewares[$url][] = $middlewareFn;
+    }
+
+    // Funcion para agregar middleware a un grupo de rutas
+    public function group(array $config, callable $callback)
+    {
+        $prefix = $config['prefix'] ?? '';
+        $middleware = $config['middleware'] ?? null;
+        if($middleware) {
+            $this->groupMiddlewares[$prefix] = $middleware;
+        }
+        $callback($this, $prefix); // Llamamos al callback con el router actual
     }
 
 
@@ -80,13 +93,55 @@ class Router {
                 $fn = null;
         }
 
+        // Ejecutar middleware por grupo de rutas
+        foreach ($this->groupMiddlewares as $prefix => $middleware) {
+            if (str_starts_with($currentUrl, $prefix)) {
+                if (!$this->runMiddleware($middleware)) return; // Si el middleware devuelve false, no se ejecuta la ruta
+            }
+        }
 
-        if ( $fn ) {
-            // Call user fn va a llamar una función cuando no sabemos cual sera
-            call_user_func($fn, $this); // This es para pasar argumentos
+        // Ejecutar middleware por ruta
+        if(isset($this->middlewares[$currentUrl])) {
+            foreach ($this->middlewares[$currentUrl] as $middleware) {
+                if(!$this->runMiddleware($middleware)) return;
+            }
+        }
+
+
+        // if ( $fn ) {
+        //     // Call user fn va a llamar una función cuando no sabemos cual sera
+        //     call_user_func($fn, $this); // This es para pasar argumentos
+        // } else {
+        //     header('Location: /404');
+        // }
+
+        if($fn) {
+            if(is_array($fn)) {
+                [$class, $method] = $fn; // Desestructuración del array
+                if (class_exists($class)) {
+                    $instance = new $class;
+                    call_user_func([$instance, $method], $this); // Llama al método del controlador con el router actual
+                } else {
+                    echo "Error: Clase $class no encontrada.";
+                }
+            } else {
+                call_user_func($fn, $this); // Llama a la función con el router actual
+            }
         } else {
             header('Location: /404');
+            return;
         }
+    }
+
+    private function runMiddleware($middleware): bool
+    {
+        if(is_callable($middleware)) {
+            return call_user_func($middleware) !== false; // Si el middleware devuelve false, no se ejecuta la ruta
+        }
+        if(is_string($middleware) && class_exists($middleware)) {
+            return call_user_func([new $middleware, 'handle']) !== false; // Si es una clase, llamamos al método handle
+        }
+        return true; // Si no es un middleware válido, continuamos
     }
 
     public function render($view, $datos = [])

@@ -1,0 +1,1 @@
+<h1>Desde /CREATE la vista</h1>

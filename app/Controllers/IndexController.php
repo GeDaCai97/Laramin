@@ -5,11 +5,24 @@ use MVC\Router;
 
 class IndexController 
 {
-    public static function index(Router $router)
+    public function index(Router $router)
     {
         $router->render('home/index', [
             'titulo' => 'PHP + MVC + Vite'
         ]);
     }
 
+    public function create (Router $router)
+    {
+        $router->render('home/create', [
+            'titulo' => 'Crear nuevo recurso'
+        ]);
+    }
+
+    public function edit (Router $router)
+    {
+        $router->render('home/edit', [
+            'titulo' => 'Editar recurso'
+        ]);
+    }
 }
