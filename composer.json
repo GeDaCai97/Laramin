@@ -19,7 +19,8 @@
             "App\\Models\\" : "app/Models",
             "MVC\\" : "./",
             "App\\Utils\\" : "app/Utils",
-            "App\\Middlewares\\" : "app/Middlewares"
+            "App\\Middlewares\\" : "app/Middlewares",
+            "Core\\" : "core"
         }
     }
 }

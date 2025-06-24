@@ -7,8 +7,11 @@ class IndexController
 {
     public function index(Router $router)
     {
-        $router->view('home/index', [
-            'titulo' => 'PHP + MVC + Vite'
+        // $router->view('home/index', [
+        //     'titulo' => 'PHP + MVC + Vite'
+        // ]);
+        $router->view('home.index', [
+            'variable' => 'Valor de la variable',
         ]);
     }
 
