@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\IndexController;
+use App\Middlewares\TestMethodMiddleware;
 use App\Middlewares\TestMiddleware;
 use MVC\Router;
 
@@ -14,12 +15,24 @@ $router->get('/', [IndexController::class, 'index']);
 // $router->middleware('/', [TestMiddleware::class, 'handle']);
 
 $router->group([
-    'prefix' => '/api',
-    'middleware' => [TestMiddleware::class, 'handle']
+    'prefix' => '/home',
+    'middleware' => TestMiddleware::class
 ], function($router, $prefix) {
     $router->get("$prefix/create", [IndexController::class, 'create']);
     $router->get("$prefix/edit", [IndexController::class, 'edit']);
 });
+
+$router->group([
+    'prefix' => '/api',
+    'middleware' => TestMethodMiddleware::class
+], function($router, $prefix) {
+    $router->post("$prefix/store", [IndexController::class, 'store']);
+    $router->put("$prefix/update", [IndexController::class, 'update']);    
+});
+
+
+$router->patch('/patch', [IndexController::class, 'patch']);
+$router->delete('/delete', [IndexController::class, 'destroy']);
 
 
 

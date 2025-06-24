@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $_ENV['APP_NAME'] ?? '' ?> | <?php echo $titulo ?? ''; ?></title>
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -17,9 +18,9 @@
 </head>
 <body>
     <?php 
-        include_once __DIR__ .'../../../views/templates/header.php';
+        include_once __DIR__ .'/../../src/views/templates/header.php';
         echo $contenido;
-        include_once __DIR__ .'../../../views/templates/footer.php'; 
+        include_once __DIR__ .'/../../src/views/templates/footer.php'; 
     ?>
 
 

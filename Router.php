@@ -96,7 +96,7 @@ class Router {
         // Ejecutar middleware por grupo de rutas
         foreach ($this->groupMiddlewares as $prefix => $middleware) {
             if (str_starts_with($currentUrl, $prefix)) {
-                if (!$this->runMiddleware($middleware)) return; // Si el middleware devuelve false, no se ejecuta la ruta
+                if (!$this->runMiddleware($middleware)) {return;} // Si el middleware devuelve false, no se ejecuta la ruta
             }
         }
 
@@ -144,7 +144,41 @@ class Router {
         return true; // Si no es un middleware válido, continuamos
     }
 
-    public function render($view, $datos = [])
+    // Funcion para devolver response JSON
+    public function json($data, int $status = 200): void
+    {
+        http_response_code($status);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+
+    //Funcion para leer JSON del body de la petición
+    public function body(): array
+    {
+        $method = $_SERVER['REQUEST_METHOD'];
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        if($method === 'GET') {
+            return $_GET; // Para GET, devolvemos los parámetros de la URL
+        }
+
+        if(str_contains($contentType, 'application/json')) {
+            $content = file_get_contents('php://input');
+            return json_decode($content, true) ?? [];
+        }
+
+        if ($method === 'POST') return $_POST;
+
+        if (str_contains($contentType, 'application/x-www-form-urlencoded')) {
+            parse_str(file_get_contents('php://input'), $data);
+            return $data;
+        }
+
+        return []; // Para otros métodos, devolvemos los datos del formulario
+    }
+
+    public function view($view, $datos = [])
     {
 
         // Leer lo que le pasamos  a la vista

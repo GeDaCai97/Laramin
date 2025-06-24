@@ -7,22 +7,68 @@ class IndexController
 {
     public function index(Router $router)
     {
-        $router->render('home/index', [
+        $router->view('home/index', [
             'titulo' => 'PHP + MVC + Vite'
         ]);
     }
 
     public function create (Router $router)
     {
-        $router->render('home/create', [
+        $router->view('home/create', [
             'titulo' => 'Crear nuevo recurso'
         ]);
     }
 
     public function edit (Router $router)
     {
-        $router->render('home/edit', [
+        $router->view('home/edit', [
             'titulo' => 'Editar recurso'
         ]);
+    }
+
+    public function store(Router $router)
+    {
+        $data = $router->body();
+        // Lógica para almacenar un nuevo recurso
+        // Aquí podrías manejar la lógica de validación y almacenamiento
+        $router->json([
+            'status' => 'success',
+            'message' => 'Recurso creado exitosamente',
+            'data' => $data
+        ], 201);
+    }
+
+    public function update(Router $router)
+    {
+        $data = $router->body();
+        // Lógica para actualizar un recurso existente
+        // Aquí podrías manejar la lógica de validación y actualización
+        $router->json([
+            'status' => 'success',
+            'message' => 'Recurso actualizado exitosamente',
+            'data' => $data
+        ], 200);
+    }
+
+    public function patch(Router $router)
+    {
+        $data = $router->body();
+        // Lógica para actualizar un recurso existente
+        // Aquí podrías manejar la lógica de validación y actualización
+        $router->json([
+            'status' => 'success',
+            'message' => 'Recurso actualizado exitosamente PATCH',
+            'data' => $data
+        ], 200);
+    }
+
+    public function destroy(Router $router)
+    {
+        // Lógica para eliminar un recurso existente
+        // Aquí podrías manejar la lógica de validación y eliminación
+        $router->json([
+            'status' => 'success',
+            'message' => 'Recurso eliminado exitosamente',
+        ], 200);
     }
 }

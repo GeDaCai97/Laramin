@@ -8,7 +8,10 @@ class TestMiddleware
         // Aquí puedes agregar la lógica del middleware
         //
         //
-
-        return true;
+        // if (!isset($_SESSION['usuario'])) {
+        //     redirect('/login');
+        //     return false; // opcional, porque redirect() ya hace exit
+        // }
+        return true; // Redirige a la ruta raíz como ejemplo
     }
 }
