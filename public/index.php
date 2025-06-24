@@ -11,6 +11,7 @@ $router = new Router();
 //Listar las rutas
 
 $router->get('/', [IndexController::class, 'index']);
+$router->get('/show', [IndexController::class, 'show']);
 
 // $router->middleware('/', [TestMiddleware::class, 'handle']);
 

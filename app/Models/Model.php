@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Core\QueryBuilder;
+
 class Model {
 
     // Base DE DATOS
@@ -35,7 +37,7 @@ class Model {
     public static function consultarSQL($query) {
         // Consultar la base de datos
         $resultado = self::$db->query($query);
-
+        
         // Iterar los resultados
         $array = [];
         while($registro = $resultado->fetch_assoc()) {
@@ -44,19 +46,30 @@ class Model {
 
         // liberar la memoria
         $resultado->free();
-
         // retornar los resultados
         return $array;
     }
 
     // Crea el objeto en memoria que es igual al de la BD
+    // protected static function crearObjeto($registro) {
+    //     $objeto = new static;
+
+    //     foreach($registro as $key => $value ) {
+    //         if(property_exists( $objeto, $key  )) {
+    //             $objeto->$key = $value;
+    //         }
+    //     }
+
+    //     return $objeto;
+    // }
+
+    // Crea el objeto en memoria que es igual al de la BD pero permite asignar propiedades dinámicamente
+    // y no solo las que existen en la clase
     protected static function crearObjeto($registro) {
         $objeto = new static;
 
         foreach($registro as $key => $value ) {
-            if(property_exists( $objeto, $key  )) {
-                $objeto->$key = $value;
-            }
+            $objeto->$key = $value;
         }
 
         return $objeto;
@@ -180,11 +193,11 @@ class Model {
         return array_shift( $resultado )  ;
     }
     
-    public static function belongsTo($columna, $valor) {
-        $query = "SELECT * FROM " . static::$tabla . " WHERE $columna = '$valor'";
-        $resultado = self::consultarSQL($query);
-        return $resultado;
-    }
+    // public static function belongsTo($columna, $valor) {
+    //     $query = "SELECT * FROM " . static::$tabla . " WHERE $columna = '$valor'";
+    //     $resultado = self::consultarSQL($query);
+    //     return $resultado;
+    // }
 
     public static function total($columna = '', $valor = '') {
         $query = "SELECT COUNT(*) FROM " . static::$tabla;
@@ -261,4 +274,70 @@ class Model {
         return $resultado;
     }
 
+    // Relaciones
+
+    // hasOne: un registro relacionado (1 a 1)
+    public function hasOne(string $related, string $foreignKey, string $localKey = 'id') {
+        $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
+        $localValue = $this->$localKey;
+
+        $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue' LIMIT 1";
+        $resultado = $related::consultarSQL($query);
+        return array_shift($resultado);
+    }
+
+    // hasMany: varios registros relacionados (1 a muchos)
+    public function hasMany(string $related, string $foreignKey, string $localKey = 'id') {
+        $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
+        $localValue = $this->$localKey;
+
+        $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue'";
+        return $related::consultarSQL($query);
+    }
+
+    // belongsTo: pertenencia (muchos a 1)
+    public function belongsTo(string $related, string $foreignKey, string $ownerKey = 'id') {
+        $foreignKeyValue = $this->$foreignKey;
+
+        $query = "SELECT * FROM " . $related::$tabla . " WHERE $ownerKey = '$foreignKeyValue' LIMIT 1";
+        $resultado = $related::consultarSQL($query);
+        return array_shift($resultado);
+    }
+
+    // belongsToMany: relación muchos a muchos con tabla pivote
+    public function belongsToMany(string $related, string $pivotTable, string $foreignPivotKey, string $relatedPivotKey, string $localKey = 'id', string $relatedKey = 'id') {
+        $localId = $this->$localKey;
+
+        $query = "SELECT r.* FROM " . $related::$tabla . " r 
+                  JOIN $pivotTable p ON r.$relatedKey = p.$relatedPivotKey
+                  WHERE p.$foreignPivotKey = '$localId'";
+
+        return $related::consultarSQL($query);
+    }
+
+    public static function with(string $relacion)
+    {
+        $instancia = new static;
+        $registros = static::all();
+        
+        foreach ($registros as $registro) {
+            $registro->$relacion = $registro->$relacion(); // carga anticipada
+        }
+
+        return $registros;
+    }
+
+    public static function raw(string $query) {
+        return self::consultarSQL($query);
+    }
+
+    public static function query()
+    {
+        return new QueryBuilder(static::$tabla, static::class);
+    }
+
+    public static function getDB()
+    {
+        return self::$db;
+    }
 }
