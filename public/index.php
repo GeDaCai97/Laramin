@@ -1,8 +1,6 @@
 <?php
 
 use App\Controllers\IndexController;
-use App\Middlewares\TestMethodMiddleware;
-use App\Middlewares\TestMiddleware;
 use MVC\Router;
 
 require_once __DIR__ . '/../config/app.php';

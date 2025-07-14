@@ -31,9 +31,4 @@ class Usuario extends Model
         $this->token = $args['token'] ?? '';
         $this->bloqueado = $args['bloqueado'] ?? 0;
     }
-
-    public function domicilio()
-    {
-        return $this->hasOne(Domicilio::class, 'usuario_id', 'id');
-    }
 }

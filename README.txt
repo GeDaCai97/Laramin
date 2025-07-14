@@ -4,15 +4,17 @@ Para correr el servicio de Vite ejecuta 'npm run dev'
 
 El archivo "public/index.php" es donde se declaran las rutas.
 
+De momento el archivo .env se debe crear manualmente en la raíz del proyecto (Tomar de ejemplo el .env.example)
+
 
 
 /* Futuras actualizaciones */
 
 Dar soporte con TailwindCSS en paralelo con SCSS
 
-Agregar al BladeLite soporte para directivas @CSFR, @PUT, @PATCH, @DELETE
+Hacer test de directivas @csfr, @PUT, @PATCH, @DELETE, @method(), @auth, @guest
 
-Checar e invetigar para implementar los JWT
+Investigar los JWT
 
 Extender la clase de servicios de Email.
 

@@ -4,6 +4,7 @@ namespace MVC;
 
 use Config\Cors;
 use Core\BladeLite;
+use CsfrMiddleware;
 
 class Router {
     // Array de rutas por method
@@ -71,15 +72,22 @@ class Router {
         $currentUrl = strtok($_SERVER['REQUEST_URI'], '?') ?? '/';
         $method = $_SERVER['REQUEST_METHOD'];
 
+        // Soporte para métodos spoofing (ej. _method en formularios)
+        if ($method === 'POST' && isset($_POST['_method'])) {
+            $method = strtoupper($_POST['_method']);
+        }
+
+
         if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
             Cors::handle();
         }
 
-        // if ($method === 'GET') {
-        //     $fn = $this->getRoutes[$currentUrl] ?? null;
-        // } else {
-        //     $fn = $this->postRoutes[$currentUrl] ?? null;
-        // }
+        if(in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+            $csrfMiddleware = new CsfrMiddleware();
+            $csrfMiddleware->handle(); // Ejecuta el middleware CSRF
+        }
+
+
         switch ($method) {
             case 'GET':
                 $fn = $this->getRoutes[$currentUrl] ?? null;

@@ -7,9 +7,8 @@ class IndexController
 {
     public function index(Router $router)
     {
-        $router->view('home.index', [
-            // variables que se pasan a la vista
-        ]);
+
+        $router->view('home.index', []);
     }
 
     public function show(Router $router)

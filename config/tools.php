@@ -107,3 +107,25 @@ function redirect(string $url, int $statusCode = 302): void
     header("Location: $url");
     exit;
 }
+
+if (!function_exists('asset')) {
+    function asset($path) {
+        return '/' . ltrim($path, '/');
+    }
+}
+
+function url(string $path = ''): string {
+    $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $scheme . '://' . $host . '/' . ltrim($path, '/');
+}
+
+function csrf_field(): string
+{
+    if (!isset($_SESSION)) session_start();
+    if (empty($_SESSION['_csrf_token'])) {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+    }
+    $token = $_SESSION['_csrf_token'];
+    return '<input type="hidden" name="_token" value="' . htmlspecialchars($token) . '">';
+}

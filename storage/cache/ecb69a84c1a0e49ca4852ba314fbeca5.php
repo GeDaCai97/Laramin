@@ -10,16 +10,20 @@
     <?php if ($_SERVER['SERVER_NAME'] === 'localhost'): ?>
         <script type="module" src="http://localhost:5173/js/main.js"></script>
     <?php else: ?>
-        <?= htmlspecialchars(vite_asset('js/main.js')) ?>
+        <?= vite_asset('js/main.js') ?>
     <?php endif; ?>
 
 </head>
 <body>
     <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/484135d900fbc53efda3e5c3fda5853f.php'; ?>
     
-    <h1>Bienvenido, Carlos XDD</h1>
+    <div class="main_container">
+        <div class="logo">
+            <img src="<?= asset('img/laravel.svg') ?>" alt="Logo" class="logo_laravel">
+        </div>
+        <h1 class="titulo_principal">Bienvenido a Laramin Framework, inspirado en el framework basado en PHP de Laravel</h1>
+    </div>
 
-    <?= htmlspecialchars(dd($data)) ?>
-
+    <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/083cb7df514ee3dc2ea90e72123a77a7.php'; ?>
 </body>
 </html>
