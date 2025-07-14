@@ -18,7 +18,8 @@
     <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/484135d900fbc53efda3e5c3fda5853f.php'; ?>
     
     <h1>Bienvenido, Carlos XDD</h1>
-    
+
+    <?= htmlspecialchars(dd($data)) ?>
 
 </body>
 </html>

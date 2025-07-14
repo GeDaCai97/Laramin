@@ -281,9 +281,10 @@ class Model {
         $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
         $localValue = $this->$localKey;
 
-        $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue' LIMIT 1";
-        $resultado = $related::consultarSQL($query);
-        return array_shift($resultado);
+        // $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue' LIMIT 1";
+        // $resultado = $related::consultarSQL($query);
+        // return array_shift($resultado);
+        return $related::query()->where($foreignKey, $localValue)->limit(1);
     }
 
     // hasMany: varios registros relacionados (1 a muchos)
@@ -291,28 +292,33 @@ class Model {
         $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
         $localValue = $this->$localKey;
 
-        $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue'";
-        return $related::consultarSQL($query);
+        // $query = "SELECT * FROM " . $related::$tabla . " WHERE $foreignKey = '$localValue'";
+        // return $related::consultarSQL($query);
+        return $related::query()->where($foreignKey, $localValue);
     }
 
     // belongsTo: pertenencia (muchos a 1)
     public function belongsTo(string $related, string $foreignKey, string $ownerKey = 'id') {
         $foreignKeyValue = $this->$foreignKey;
 
-        $query = "SELECT * FROM " . $related::$tabla . " WHERE $ownerKey = '$foreignKeyValue' LIMIT 1";
-        $resultado = $related::consultarSQL($query);
-        return array_shift($resultado);
+        // $query = "SELECT * FROM " . $related::$tabla . " WHERE $ownerKey = '$foreignKeyValue' LIMIT 1";
+        // $resultado = $related::consultarSQL($query);
+        // return array_shift($resultado);
+        return $related::query()->where($ownerKey, $foreignKeyValue)->limit(1);
     }
 
     // belongsToMany: relación muchos a muchos con tabla pivote
     public function belongsToMany(string $related, string $pivotTable, string $foreignPivotKey, string $relatedPivotKey, string $localKey = 'id', string $relatedKey = 'id') {
         $localId = $this->$localKey;
 
-        $query = "SELECT r.* FROM " . $related::$tabla . " r 
-                  JOIN $pivotTable p ON r.$relatedKey = p.$relatedPivotKey
-                  WHERE p.$foreignPivotKey = '$localId'";
-
-        return $related::consultarSQL($query);
+        // $query = "SELECT r.* FROM " . $related::$tabla . " r 
+        //           JOIN $pivotTable p ON r.$relatedKey = p.$relatedPivotKey
+        //           WHERE p.$foreignPivotKey = '$localId'";
+        // return $related::consultarSQL($query);
+        $query = $related::query();
+        $query->join($pivotTable, "$related::$tabla.$relatedKey", '=', "$pivotTable.$relatedPivotKey")
+                ->where("$pivotTable.$foreignPivotKey", $localId);
+        return $query;
     }
 
     public static function with(string $relacion)

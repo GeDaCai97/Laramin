@@ -12,6 +12,7 @@ class TestMiddleware
         //     redirect('/login');
         //     return false; // opcional, porque redirect() ya hace exit
         // }
+        //dd('Middleware TestMiddleware ejecutado');
         return true; // Redirige a la ruta raíz como ejemplo
     }
 }

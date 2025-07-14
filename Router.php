@@ -2,6 +2,7 @@
 
 namespace MVC;
 
+use Config\Cors;
 use Core\BladeLite;
 
 class Router {
@@ -69,6 +70,10 @@ class Router {
 
         $currentUrl = strtok($_SERVER['REQUEST_URI'], '?') ?? '/';
         $method = $_SERVER['REQUEST_METHOD'];
+
+        if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
+            Cors::handle();
+        }
 
         // if ($method === 'GET') {
         //     $fn = $this->getRoutes[$currentUrl] ?? null;
@@ -207,9 +212,15 @@ class Router {
     // }
     public function view(string $view, array $datos = [])
     {
+        if (str_starts_with($_SERVER['REQUEST_URI'], '/api')) {
+            // No renderiza vistas en modo API
+            http_response_code(404);
+            echo json_encode(['error' => 'No se permite renderizar vistas en modo API']);
+            exit;
+        }
 
         $blade = new BladeLite(
-            __DIR__ . '/src/views',         // Ruta base de vistas
+            __DIR__ . '/src/views',     // Ruta base de vistas
             __DIR__ . '/storage/cache'  // Ruta donde guardar los compilados
         );
 

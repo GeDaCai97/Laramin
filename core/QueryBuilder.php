@@ -10,6 +10,7 @@ class QueryBuilder
     protected array $wheres = [];
     protected ?string $orderBy = null;
     protected array $selects = ['*'];
+    protected ?int $limit = null;
 
     public function __construct(string $tabla, string $modelo)
     {
@@ -80,6 +81,25 @@ class QueryBuilder
             $sql .= ' WHERE ' . implode(' AND ', $this->wheres);
         }
 
+        if ($this->orderBy) {
+            $sql .= ' ORDER BY ' . $this->orderBy;
+        }
+
+        if (!is_null($this->limit)) {
+            $sql .= ' LIMIT ' . $this->limit;
+        }
+
         return $sql;
+    }
+
+    public function limit(int $cantidad): self
+    {
+        $this->limit = $cantidad;
+        return $this;
+    }
+
+    public function toSql(): string
+    {
+        return $this->buildSelectQuery();
     }
 }

@@ -4,5 +4,6 @@
 
 @section('content')
     <h1>Bienvenido, Carlos XDD</h1>
-    
+
+    {{ dd($data) }}
 @endsection

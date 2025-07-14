@@ -20,7 +20,8 @@
             "MVC\\" : "./",
             "App\\Utils\\" : "app/Utils",
             "App\\Middlewares\\" : "app/Middlewares",
-            "Core\\" : "core"
+            "Core\\" : "core",
+            "Config\\" : "config"
         }
     }
 }

@@ -11,29 +11,24 @@ $router = new Router();
 //Listar las rutas
 
 $router->get('/', [IndexController::class, 'index']);
-$router->get('/show', [IndexController::class, 'show']);
 
-// $router->middleware('/', [TestMiddleware::class, 'handle']);
+// Ejemplo de middlewares a una ruta específica o a un grupo de rutas
 
-$router->group([
-    'prefix' => '/home',
-    'middleware' => TestMiddleware::class
-], function($router, $prefix) {
-    $router->get("$prefix/create", [IndexController::class, 'create']);
-    $router->get("$prefix/edit", [IndexController::class, 'edit']);
-});
+// $router->middleware('/', TestMiddleware::class);
 
-$router->group([
-    'prefix' => '/api',
-    'middleware' => TestMethodMiddleware::class
-], function($router, $prefix) {
-    $router->post("$prefix/store", [IndexController::class, 'store']);
-    $router->put("$prefix/update", [IndexController::class, 'update']);    
-});
+// $router->group([
+//     'prefix' => '/home',
+//     'middleware' => TestMiddleware::class
+// ], function($router, $prefix) {
+//     $router->get("$prefix/create", [IndexController::class, 'create']);
+//     $router->get("$prefix/edit", [IndexController::class, 'edit']);
+// });
 
 
-$router->patch('/patch', [IndexController::class, 'patch']);
-$router->delete('/delete', [IndexController::class, 'destroy']);
+//Rutas que empiecen con /api no cargan BladeLite "reservado para API"
+
+// $router->post("/api/store", [IndexController::class, 'store']);
+// $router->put("/api/update", [IndexController::class, 'update']);
 
 
 

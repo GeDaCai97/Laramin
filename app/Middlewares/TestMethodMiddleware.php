@@ -6,10 +6,10 @@ class TestMethodMiddleware
 {
     public function handle()
     {
-        return json_response([
-            'error' => 'Error',
-            'message' => 'No Autorizado'
-        ], 401);
-        
+        // return json_response([
+        //     'error' => 'Error',
+        //     'message' => 'No Autorizado'
+        // ], 401);
+        return true;
     }
 }
