@@ -21,7 +21,7 @@
         <div class="logo">
             <img src="<?= asset('img/laravel.svg') ?>" alt="Logo" class="logo_laravel">
         </div>
-        <h1 class="titulo_principal">Bienvenido a Laramin Framework, inspirado en el framework basado en PHP de Laravel</h1>
+        <h1 class="titulo_principal text-3xl font-bold">Bienvenido a Laramin Framework, inspirado en el framework basado en PHP de Laravel</h1>
     </div>
 
     <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/083cb7df514ee3dc2ea90e72123a77a7.php'; ?>

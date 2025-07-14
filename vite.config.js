@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     root: 'src',
@@ -18,5 +19,8 @@ export default defineConfig({
         origin: 'http://localhost:5173',
         cors: true,
         strictPort: true,
-    }
+    },
+    plugins: [
+        tailwindcss()
+    ],
 })
