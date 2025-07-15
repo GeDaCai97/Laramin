@@ -15,8 +15,8 @@
 
 </head>
 <body>
-    @include('templates.header')
+    <x-header />
     @yield('content')
-    @include('templates.footer')
+    <x-footer />
 </body>
 </html>

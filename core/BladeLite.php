@@ -55,6 +55,10 @@ class BladeLite
             $includes[] = $this->parentLayout;
         }
 
+        // Detectar componentes
+        $components = $this->getComponentsRecursive($view);
+        $includes = array_merge($includes, $components);
+
         // Determinar si se debe recompilar
         $shouldCompile = !file_exists($compiledFile) || filemtime($viewFile) > filemtime($compiledFile);
 
@@ -62,6 +66,14 @@ class BladeLite
             $includePath = $this->viewPath . '/' . str_replace('.', '/', $includeView) . '.blade.php';
             //if (file_exists($includePath) && filemtime($includePath) > filemtime($compiledFile)) {
             if (!file_exists($compiledFile) || (file_exists($includePath) && filemtime($includePath) > filemtime($compiledFile))) {
+                $shouldCompile = true;
+                break;
+            }
+        }
+        // Revisar componentes usados
+        foreach ($components as $componentView) {
+            $componentPath = $this->viewPath . '/' . str_replace('.', '/', $componentView) . '.blade.php';
+            if (file_exists($componentPath) && filemtime($componentPath) > filemtime($compiledFile)) {
                 $shouldCompile = true;
                 break;
             }
@@ -208,6 +220,90 @@ class BladeLite
             $template = preg_replace($pattern, $replacement, $template);
         }
 
+        //Procesar components
+        
+        //<x-></x->
+        $template = preg_replace_callback('/<x-([\w\.\-]+)([^>]*)>(.*?)<\/x-\1>/s', function ($matches) {
+            $component = str_replace('.', '/', $matches[1]);
+            $rawAttributes = trim($matches[2]);
+            $slotContent = trim($matches[3]);
+
+            // Parsear atributos tipo: key="value"
+            preg_match_all('/(\w+)\s*=\s*"([^"]+)"/', $rawAttributes, $attrMatches, PREG_SET_ORDER);
+            $attrs = [];
+            foreach ($attrMatches as $attr) {
+                $key = $attr[1];
+                $value = $attr[2];
+                $attrs[] = "'$key' => \"$value\"";
+            }
+
+            // Agregar el slot como último atributo
+            $attrs[] = "'slot' => <<<HTML\n$slotContent\nHTML";
+
+            return "<?php echo \$this->renderComponent('$component', [" . implode(', ', $attrs) . "]); ?>";
+        }, $template);
+
+        // Procesar componentes tipo <x-nombre />
+        $template = preg_replace_callback('/<x-([\w\.\-]+)([^\/>]*)\s*\/>/', function ($matches) {
+            $component = str_replace('.', '/', $matches[1]);
+            $rawAttributes = trim($matches[2]);
+
+            preg_match_all('/(\w+)\s*=\s*"([^"]+)"/', $rawAttributes, $attrMatches, PREG_SET_ORDER);
+            $attrs = [];
+            foreach ($attrMatches as $attr) {
+                $key = $attr[1];
+                $value = $attr[2];
+                $attrs[] = "'$key' => \"$value\"";
+            }
+
+            return "<?php echo \$this->renderComponent('$component', [" . implode(', ', $attrs) . "]); ?>";
+        }, $template);
+
+
+        /*
+        $template = preg_replace_callback(
+            '/<x-([\w\-]+)([^>]*)\s*(?:\/>|>(.*?)<\/x-\1>)/s',
+            function ($matches) {
+                $component = str_replace('-', '/', $matches[1]);
+                $attributesRaw = $matches[2] ?? '';
+                $slotContent = $matches[3] ?? null;
+
+                // Parsear atributos a variables PHP
+                preg_match_all('/(\w+)=(["\'])(.*?)\2/', $attributesRaw, $attrMatches, PREG_SET_ORDER);
+                $attributes = '';
+                foreach ($attrMatches as $attr) {
+                    $key = $attr[1];
+                    $value = addslashes($attr[3]);
+                    $attributes .= "\$$key = \"$value\";\n";
+                }
+
+                // Si hay contenido en el tag, pasar como $slot
+                if ($slotContent !== null) {
+                    $slotContent = addslashes($slotContent);
+                    $attributes .= "\$slot = \"$slotContent\";\n";
+                }
+
+                $componentView = $this->viewPath . "/components/{$component}.blade.php";
+                $compiledComponent = $this->cachePath . '/' . md5("components/{$component}") . '.php';
+
+                // Compilar componente si es necesario
+                if (!file_exists($compiledComponent) || (file_exists($componentView) && filemtime($componentView) > filemtime($compiledComponent))) {
+                    if (file_exists($componentView)) {
+                        $componentContent = file_get_contents($componentView);
+                        $compiledContent = $this->compileString($componentContent);
+                        file_put_contents($compiledComponent, $compiledContent);
+                    } else {
+                        return "<?php // Componente no encontrado: $component  ?>";
+                    }
+                }
+
+                // Incluir el componente pasando las variables
+                return "<?php\n$attributes\ninclude '$compiledComponent';\n?>";
+            },
+            $template
+        );
+        */
+
         // Reemplazo personalizado para @include
         $template = preg_replace_callback(
             '/@include\([\'"](.+?)[\'"]\)/',
@@ -292,5 +388,69 @@ class BladeLite
         }
 
         return array_unique($found);
+    }
+
+    protected function getComponentsRecursive(string $view): array
+    {
+        $checked = [];
+        $toCheck = [$view];
+        $found = [];
+
+        while (!empty($toCheck)) {
+            $current = array_pop($toCheck);
+            if (in_array($current, $checked)) continue;
+            $checked[] = $current;
+
+            $path = $this->viewPath . '/' . str_replace('.', '/', $current) . '.blade.php';
+            if (!file_exists($path)) continue;
+
+            $content = file_get_contents($path);
+
+            // Detecta componentes tipo <x-nombre />
+            preg_match_all('/<x-([\w\.\-]+)/', $content, $matches);
+            foreach ($matches[1] as $component) {
+                $componentView = 'components.' . str_replace('.', '/', $component);
+                $componentView = str_replace('/', '.', $componentView);
+                $found[] = $componentView;
+                $toCheck[] = $componentView;
+            }
+
+            // Detectar también includes anidados o layouts extendidos
+            if (preg_match('/@extends\([\'"](.+)[\'"]\)/', $content, $layoutMatch)) {
+                $toCheck[] = $layoutMatch[1];
+            }
+
+            preg_match_all('/@include\([\'"](.+?)[\'"]\)/', $content, $includes);
+            foreach ($includes[1] as $includeView) {
+                $toCheck[] = $includeView;
+            }
+        }
+
+        return array_unique($found);
+    }
+
+    protected function renderComponent(string $name, array $data = []) :string
+    {
+        $relativePath = 'components/' . str_replace('.', '/', $name);
+        $componentPath = $this->viewPath . '/' . $relativePath . '.blade.php';
+        $compiledFile = $this->cachePath . '/' . md5($relativePath) . '.php';
+
+        if (!file_exists($componentPath)) {
+            return "<!-- Componente '$name' no encontrado en '$componentPath' -->";
+        }
+
+        // Recompilar si el componente cambió
+        $shouldCompile = !file_exists($compiledFile) || filemtime($componentPath) > filemtime($compiledFile);
+
+        if ($shouldCompile) {
+            $componentContent = file_get_contents($componentPath);
+            $compiled = $this->compileString($componentContent);
+            file_put_contents($compiledFile, $compiled);
+        }
+
+        extract($data);
+        ob_start();
+        include $compiledFile;
+        return ob_get_clean();
     }
 }

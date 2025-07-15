@@ -129,3 +129,16 @@ function csrf_field(): string
     $token = $_SESSION['_csrf_token'];
     return '<input type="hidden" name="_token" value="' . htmlspecialchars($token) . '">';
 }
+
+// function renderComponent(string $name, array $data = []): string
+// {
+//     $path = __DIR__ . "/src/views/components/{$name}.blade.php";
+//     if (!file_exists($path)) {
+//         return "<!-- Componente '$name' '$path' no encontrado -->";
+//     }
+
+//     extract($data); // Extrae 'slot', 'title', etc. como variables PHP
+//     ob_start();
+//     include $path;
+//     return ob_get_clean();
+// }

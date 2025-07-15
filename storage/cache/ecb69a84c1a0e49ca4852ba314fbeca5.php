@@ -15,15 +15,34 @@
 
 </head>
 <body>
-    <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/484135d900fbc53efda3e5c3fda5853f.php'; ?>
+    <?php echo $this->renderComponent('header', []); ?>
     
-    <div class="main_container">
-        <div class="logo">
-            <img src="<?= asset('img/laravel.svg') ?>" alt="Logo" class="logo_laravel">
-        </div>
-        <h1 class="titulo_principal text-3xl font-bold">Bienvenido a Laramin Framework, inspirado en el framework basado en PHP de Laravel</h1>
-    </div>
+    <main>
+        <section class="main_container">
+            <div class="logo">
+                <img src="<?= asset('img/laravel.svg') ?>" alt="Logo" class="logo_laravel">
+            </div>
+            <h1 class="titulo_principal text-3xl font-bold">Bienvenido a Laramin Framework, inspirado en el framework basado en PHP de Laravel</h1>
+        </section>
+        <section class="mx-20 my-8">
+            <h3 class="p-8 text-2xl font-bold text-center">¡Novedades!</h3>
+            <div class="grid grid-cols-3 gap-4 content-center">
+                <?php echo $this->renderComponent('card', ['slot' => <<<HTML
+Integracion de TailwindCSS y SCSS
+HTML]); ?>
+                <?php echo $this->renderComponent('card', ['slot' => <<<HTML
+Soporte para components en Blade
+HTML]); ?>
+                <?php echo $this->renderComponent('card', ['slot' => <<<HTML
+Motor Blade para vistas
+HTML]); ?>
+            </div>
 
-    <?php include 'D:\Proyectos_web\FrameworkProject/storage/cache/083cb7df514ee3dc2ea90e72123a77a7.php'; ?>
+        </section>
+    </main>
+
+    
+
+    <?php echo $this->renderComponent('footer', []); ?>
 </body>
 </html>
